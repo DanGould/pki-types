@@ -602,6 +602,10 @@ fn hex<'a>(f: &mut fmt::Formatter<'_>, payload: impl IntoIterator<Item = &'a u8>
 #[cfg(all(test, feature = "std"))]
 mod tests {
     use super::*;
+    #[cfg(target_arch = "wasm32")]
+    use wasm_bindgen_test::{wasm_bindgen_test as test, wasm_bindgen_test_configure};
+    #[cfg(target_arch = "wasm32")]
+    wasm_bindgen_test_configure!(run_in_browser);
 
     #[test]
     fn der_debug() {
