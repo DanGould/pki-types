@@ -52,8 +52,13 @@ use alloc::vec::Vec;
 use core::fmt;
 use core::ops::Deref;
 use core::time::Duration;
-#[cfg(feature = "std")]
+#[cfg(all(
+    feature = "std",
+    not(all(target_family = "wasm", target_os = "unknown", feature = "web"))
+))]
 use std::time::SystemTime;
+#[cfg(all(target_family = "wasm", target_os = "unknown", feature = "web"))]
+use web_time::SystemTime;
 
 mod server_name;
 pub use server_name::{
@@ -478,7 +483,13 @@ pub struct UnixTime(u64);
 
 impl UnixTime {
     /// The current time, as a `UnixTime`
-    #[cfg(feature = "std")]
+    #[cfg(any(
+        all(
+            feature = "std",
+            not(all(target_family = "wasm", target_os = "unknown"))
+        ),
+        all(target_family = "wasm", target_os = "unknown", feature = "web")
+    ))]
     pub fn now() -> Self {
         Self::since_unix_epoch(
             SystemTime::now()
