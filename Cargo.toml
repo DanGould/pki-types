@@ -14,6 +14,13 @@ categories = ["network-programming", "data-structures", "cryptography"]
 default = ["alloc"]
 alloc = []
 std = ["alloc"]
+web = ["web-time"]
+
+[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
+web-time = { version = "1", optional = true }
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+wasm-bindgen-test = "0.3"
 
 [package.metadata.docs.rs]
 all-features = true

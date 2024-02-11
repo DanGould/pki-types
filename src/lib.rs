@@ -52,8 +52,13 @@ use alloc::vec::Vec;
 use core::fmt;
 use core::ops::Deref;
 use core::time::Duration;
-#[cfg(feature = "std")]
+#[cfg(all(
+    feature = "std",
+    not(all(target_family = "wasm", target_os = "unknown", feature = "web"))
+))]
 use std::time::SystemTime;
+#[cfg(all(target_family = "wasm", target_os = "unknown", feature = "web"))]
+use web_time::SystemTime;
 
 mod server_name;
 pub use server_name::{
@@ -478,7 +483,13 @@ pub struct UnixTime(u64);
 
 impl UnixTime {
     /// The current time, as a `UnixTime`
-    #[cfg(feature = "std")]
+    #[cfg(any(
+        all(
+            feature = "std",
+            not(all(target_family = "wasm", target_os = "unknown"))
+        ),
+        all(target_family = "wasm", target_os = "unknown", feature = "web")
+    ))]
     pub fn now() -> Self {
         Self::since_unix_epoch(
             SystemTime::now()
@@ -591,6 +602,10 @@ fn hex<'a>(f: &mut fmt::Formatter<'_>, payload: impl IntoIterator<Item = &'a u8>
 #[cfg(all(test, feature = "std"))]
 mod tests {
     use super::*;
+    #[cfg(target_arch = "wasm32")]
+    use wasm_bindgen_test::{wasm_bindgen_test as test, wasm_bindgen_test_configure};
+    #[cfg(target_arch = "wasm32")]
+    wasm_bindgen_test_configure!(run_in_browser);
 
     #[test]
     fn der_debug() {

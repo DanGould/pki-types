@@ -1,5 +1,10 @@
 use rustls_pki_types::DnsName;
 
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen_test::{wasm_bindgen_test as test, wasm_bindgen_test_configure};
+#[cfg(target_arch = "wasm32")]
+wasm_bindgen_test_configure!(run_in_browser);
+
 // (name, is_valid)
 static DNS_NAME_VALIDITY: &[(&[u8], bool)] = &[
     (b"a", true),

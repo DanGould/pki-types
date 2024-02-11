@@ -1,5 +1,10 @@
 use rustls_pki_types::ServerName;
 
+#[cfg(target_arch = "wasm32")]
+use wasm_bindgen_test::{wasm_bindgen_test as test, wasm_bindgen_test_configure};
+#[cfg(target_arch = "wasm32")]
+wasm_bindgen_test_configure!(run_in_browser);
+
 fn compile_time_assert_hash<T: core::hash::Hash>() {}
 fn compile_time_assert_send<T: Send>() {}
 fn compile_time_assert_sync<T: Sync>() {}

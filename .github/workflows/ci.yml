@@ -55,6 +55,51 @@ jobs:
         env:
           RUST_BACKTRACE: 1
 
+  wasm_build:
+    name: Build + test wasm32
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        webdriver:
+         - firefox
+         - chrome
+
+    steps:
+      - run: sudo apt-get update -y
+
+      - name: Checkout sources
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+
+      - name: Add wasm target
+        run: rustup target add wasm32-unknown-unknown
+
+      - uses: jetli/wasm-pack-action@v0.4.0
+        with:
+          version: 'v0.12.1'
+
+      - name: Run wasm-pack tests (default features)
+        run: wasm-pack test --headless --${{ matrix.webdriver }} -- --lib
+        env:
+          RUST_BACKTRACE: 1
+
+      - name: Run wasm-pack tests (all features)
+        run: wasm-pack test --headless --${{ matrix.webdriver }} -- --lib --all-features
+        env:
+          RUST_BACKTRACE: 1
+
+      - name: Run wasm-pack tests (no default features)
+        run: wasm-pack test --headless --${{ matrix.webdriver }} -- --lib --no-default-features
+        env:
+          RUST_BACKTRACE: 1
+
   msrv:
     runs-on: ${{ matrix.os }}
     strategy:
